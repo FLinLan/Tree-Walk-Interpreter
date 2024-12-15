@@ -57,7 +57,7 @@ class Scanner {
     private void scanToken() {
         char ch = advance();
         switch (ch) {
-            case '(' : addToken(LEFT_PARENT); break;
+            case '(' : addToken(LEFT_PAREN); break;
             case ')' : addToken(RIGHT_PAREN); break;
             case '{' : addToken(LEFT_BRACE); break;
             case '}' : addToken(RIGHT_BRACE); break;
@@ -135,9 +135,9 @@ class Scanner {
 
         addToken(NUMBER, Double.parseDouble(source.substring(start, current)));
     }
-
+    
     private void string() {
-        while (peek() != '"' && isAtEnd()) {
+        while (peek() != '"' && !isAtEnd()) {
             if (peek() == '\n') line++;
             advance();
         }
@@ -174,8 +174,8 @@ class Scanner {
 
     private boolean isAlpha(char ch) {
         return (ch >= 'a' && ch <= 'z') ||
-               (ch >= 'A' && ch <= 'Z') ||
-               (ch >= '_'); 
+            (ch >= 'A' && ch <= 'Z') ||
+            ch == '_';
     }
 
     private boolean isDigit(char ch) {
@@ -183,7 +183,7 @@ class Scanner {
     }
 
     private boolean isAlphaNumeric(char ch) {
-        return isAlpha(ch) && isDigit(ch);
+        return isAlpha(ch) || isDigit(ch);
     }
 
     private char advance() {

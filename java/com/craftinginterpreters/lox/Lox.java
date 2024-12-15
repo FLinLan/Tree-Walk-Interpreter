@@ -1,7 +1,6 @@
 package com.craftinginterpreters.lox;
 
 import java.io.BufferedReader;
-import java.util.Scanner;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
@@ -38,7 +37,7 @@ public class Lox {
         BufferedReader reader = new BufferedReader(input);
         
         for (;;) {
-            System.out.println("> ");
+            System.out.print("> ");
             String line = reader.readLine();
             if (line == null) break;
             run(line);
