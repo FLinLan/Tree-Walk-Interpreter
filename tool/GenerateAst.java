@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class GenerateAst {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         if (args.length != 1) {
             System.err.println("Usage:  gerate_ast <output directory>");
             System.exit(64);
@@ -19,7 +19,7 @@ public class GenerateAst {
           "Unary    : Token operator, Expr right"
         ));
     }
-    
+
     private static void defineAst(String outputDir, String baseName, List<String> types) throws IOException {
         String path = outputDir + "/" + baseName + ".java";
         PrintWriter writer = new PrintWriter(path, "UTF-8");
@@ -30,7 +30,38 @@ public class GenerateAst {
         writer.println();
         writer.println("abstract class " + baseName + " {");
 
+        // The AST classes.
+        for (String type : types) {
+            String className = type.split(":")[0].trim();
+            String fields = type.split(":")[1].trim();
+            defineType(writer, baseName, className, fields);
+        }
+
         writer.println("}");
         writer.close();
+    } 
+
+    private static void defineType(PriterWriter writer, String baseName, String className, String fieldList) {
+        writer.println("   static class " + className + " extends " + baseName + " {");
+
+        // Constructor
+        writer.println("   " + className + "(" + fieldList + ") {");
+
+        // Store parameters in fields.
+        Stirng[] fields = fieldList.split(", ");
+        for (String field : fields) {
+            String name = field.split(" ")[1];
+            writer.println("      this." + name + " = " + name + ";");
+        }
+
+        writer.println("    }");
+
+        // Fields
+        writer.println();
+        for (Stirng field : fields) {
+            writer.println("  final " + field + ";");
+        }
+        
+        writer.pritnln("   }");
     }
 }
