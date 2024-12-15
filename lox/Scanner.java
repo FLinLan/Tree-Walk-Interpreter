@@ -14,6 +14,28 @@ class Scanner {
     private int current = 0;
     private int line = 1;
 
+    private static final Map<String, TokenType> keywords;
+    static {
+        keywords = new HashMap<>();
+        keywords.put("and", AND);
+        keywords.put("class", CLASS);
+        keywords.put("else", ELSE);
+        keywords.put("false", FALSE);
+        keywords.put("for", FOR);
+        keywords.put("fun", FUN);
+        keywords.put("if", IF);
+        keywords.put("nil", NIL);
+        keywords.put("or", OR);
+        keywords.put("print", PRINT);
+        keywords.put("return", RETURN);
+        keywords.put("super", SUPER);
+        keywords.put("this", THIS);
+        keywords.put("true", TRUE);
+        keywords.put("var", VAR);
+        keywords.put("while", WHILE);
+    }
+
+    
     Scanner(String source) {
         this.source = source;
     }
@@ -24,7 +46,7 @@ class Scanner {
             start = current;
             scanToken();
         }
-        tokens.add(new Tokens(EOF, "", null, line));
+        tokens.add(new Token(EOF, "", null, line));
         return tokens;
     }
 
@@ -52,10 +74,10 @@ class Scanner {
             case '=':
                 addToken(match('=') ? EQUAL_EQUAL : EQUAL);
                 break;            
-            case '!':
+            case '<':
                 addToken(match('<') ? LESS_EQUAL : LESS);
                 break;            
-            case '!':
+            case '>':
                 addToken(match('>') ? GREATER_EQUAL : GREATER);
                 break;
             
@@ -68,9 +90,9 @@ class Scanner {
                 }
                 break;
             
-            case ' ';
-            case '\r';
-            case ' \t';
+            case ' ':
+            case '\r':
+            case '\t':
                 // Ignore whitespace
                 break;
             
@@ -78,16 +100,41 @@ class Scanner {
                 line++;
                 break;
             
-            case ' " ': string(); break;
+            case '"': string(); break;
 
             default:
-                Lox.error(line, "Unexpected character.");
+                if (isDigit(ch)) {
+                    number();
+                }else if (isAlpha(ch)) {
+                    identifier();
+                } else {
+                    Lox.error(line, "Unexpected character.");
+                }
                 break;
         }
     }
+    private void identifier() {
+        while (isAlphaNumeric(peek())) advance();
+
+        addToken(IDENTIFIER);
+    }
+
+    private void number() {
+        while (isDigit(peek())) advance();
+
+        // Look for a fractional part.
+        if (peek() == '.' && isDigit(peekNext())) {
+            // Consume the "."
+            advance();
+
+            while (isDigit(peek())) advance();
+        }
+
+        addToken(NUMBER, Double.parseDouble(source.substring(start, current)));
+    }
 
     private void string() {
-        while (peek() != ' " ' && isAtEnd()) {
+        while (peek() != '"' && isAtEnd()) {
             if (peek() == '\n') line++;
             advance();
         }
@@ -96,7 +143,7 @@ class Scanner {
             Lox.error(line, "Unterminated string.");
             return;
         }
-
+        
         advance(); // The closing ".
 
         // Trim the surrounding quotes.
@@ -107,14 +154,33 @@ class Scanner {
     private boolean match(char expected) {
         if (isAtEnd()) return false;
         if (source.charAt(current) != expected) return false;
-
+        
         current++;
         return true;
     }
-
+    
     private char peek() {
         if (isAtEnd()) return '\0';
         return source.charAt(current);
+    }
+
+    private char peekNext() {
+        if (current + 1 >= source.length()) return '\0';
+        return source.charAt(current + 1);
+    }
+
+    private boolean isAlpha(char ch) {
+        return (ch >= 'a' && ch <= 'z') ||
+               (ch >= 'A' && ch <= 'Z') ||
+               (ch >= '_'); 
+    }
+
+    private boolean isDigit(char ch) {
+        return ch >= '0' && ch <= '9';
+    }
+
+    private boolean isAlphaNumeric(char ch) {
+        return isAlpha(ch) && isDigit(ch);
     }
 
     private char advance() {
@@ -129,4 +195,6 @@ class Scanner {
         String text = source.substring(start, current);
         tokens.add(new Token(type, text, literal, line));
     }
+
+    
 }
