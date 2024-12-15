@@ -8,7 +8,7 @@ import java.util.List;
 public class GenerateAst {
     public static void main(String[] args) throws IOException {
         if (args.length != 1) {
-            System.err.println("Usage:  gerate_ast <output directory>");
+            System.err.println("Usage:  generate_ast <output directory>");
             System.exit(64);
         }
         String outputDir = args[0];
@@ -43,16 +43,16 @@ public class GenerateAst {
 
         writer.println("}");
         writer.close();
-    } 
+    }
 
-    private static void defineType(PriterWriter writer, String baseName, String className, String fieldList) {
+    private static void defineType(PrintWriter writer, String baseName, String className, String fieldList) {
         writer.println("   static class " + className + " extends " + baseName + " {");
 
         // Constructor
         writer.println("   " + className + "(" + fieldList + ") {");
 
         // Store parameters in fields.
-        Stirng[] fields = fieldList.split(", ");
+        String[] fields = fieldList.split(", ");
         for (String field : fields) {
             String name = field.split(" ")[1];
             writer.println("      this." + name + " = " + name + ";");
@@ -69,14 +69,14 @@ public class GenerateAst {
 
         // Fields
         writer.println();
-        for (Stirng field : fields) {
+        for (String field : fields) {
             writer.println("  final " + field + ";");
         }
 
-        writer.pritnln("   }");
+        writer.println("   }");
     }
 
-    private static void defineVisitor(PriterWriter writer, String baseName, List<String> types) {
+    private static void defineVisitor(PrintWriter writer, String baseName, List<String> types) {
         writer.println("   interface Visitor<R> {");
 
         for (String type : types) {

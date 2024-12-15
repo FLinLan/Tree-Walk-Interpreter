@@ -1,4 +1,6 @@
 package com.craftinginterpreters.lox;
+import java.util.List;
+
 
 class AstPrinter implements Expr.Visitor<String> {
     String print(Expr expr) {
@@ -12,7 +14,7 @@ class AstPrinter implements Expr.Visitor<String> {
 
     @Override
     public String visitGropuingExpr(Expr.Grouping expr) {
-        return parenthesize("group", expr.epxression);
+        return parenthesize("group", expr.expression);
     }
 
     @Override
@@ -27,7 +29,7 @@ class AstPrinter implements Expr.Visitor<String> {
     }
 
     private String parenthesize(String name, Expr... exprs) {
-        StringBuilder builder = new StirngBuilder();
+        StringBuilder builder = new StringBuilder();
 
         builder.append("(").append(name);
         for (Expr expr : exprs) {
