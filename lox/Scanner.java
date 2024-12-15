@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-// import static com.craftinginterpreters.lox.TokenType.*;
+import static com.craftinginterpreters.lox.TokenType.*;
 
 class Scanner {
     private final String source;
@@ -35,7 +35,7 @@ class Scanner {
         keywords.put("while", WHILE);
     }
 
-    
+
     Scanner(String source) {
         this.source = source;
     }
@@ -115,8 +115,11 @@ class Scanner {
     }
     private void identifier() {
         while (isAlphaNumeric(peek())) advance();
-
-        addToken(IDENTIFIER);
+        
+        String text = source.substring(start, current);
+        TokenType type = keywords.get(text);
+        if (type == null) type = IDENTIFIER;
+        addToken(type);
     }
 
     private void number() {
@@ -196,5 +199,4 @@ class Scanner {
         tokens.add(new Token(type, text, literal, line));
     }
 
-    
 }
