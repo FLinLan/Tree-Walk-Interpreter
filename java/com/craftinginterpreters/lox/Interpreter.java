@@ -1,0 +1,21 @@
+package com.craftinginterpreters.lox;
+
+class Interpreter implements Expr.Visitor<Object> {
+    @Override
+    public Object visitLiteralExpr(Expr.Binary expr) {
+        // Implementation of binary expression evaluation
+        // and return the result
+        return expr.value;
+    }
+    @Override
+    public Object visitGroupingExpr(Expr.Grouping expr) {
+        return evaluate(expr.expression);
+    }
+
+    private Object evaluate(Expr expr) {
+        return expr.accept(this);
+    }
+
+
+
+}
