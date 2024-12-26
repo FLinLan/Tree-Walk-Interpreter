@@ -12,7 +12,7 @@ import java.util.List;
 public class Lox {
     static boolean hadError = false;
 
-    public static void main(String[] args) throws IOException{
+    public static void main(String[] args) throws IOException {
         if (args.length > 1) {
             System.out.println("Usage: jlox [script]");
             System.exit(64);
@@ -22,12 +22,12 @@ public class Lox {
             runPrompt();
         }
     }
-    
+
     private static void runFile(String path) throws IOException {
         byte[] bytes = Files.readAllBytes(Paths.get(path));
         run(new String(bytes, Charset.defaultCharset()));
 
-        // Indicate an erorr in the exit code
+        // Indicate an error in the exit code
         if (hadError) System.exit(65);
     }
 
@@ -35,7 +35,7 @@ public class Lox {
     private static void runPrompt() throws IOException {
         InputStreamReader input = new InputStreamReader(System.in);
         BufferedReader reader = new BufferedReader(input);
-        
+
         for (;;) {
             System.out.print("> ");
             String line = reader.readLine();
@@ -44,7 +44,7 @@ public class Lox {
             hadError = false;
         }
     }
-    
+
     private static void run(String source) {
         Scanner scanner = new Scanner(source);
         List<Token> tokens = scanner.scanTokens();

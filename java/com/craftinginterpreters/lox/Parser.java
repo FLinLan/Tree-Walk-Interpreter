@@ -11,6 +11,13 @@ class Parser {
         this.tokens = tokens;
     }
 
+    Expr parse() {
+        try {
+            return expression();
+        } catch (ParseError error) {
+            return null;
+        }
+    }
 
     private Expr expression() {
         return equality();
@@ -42,7 +49,7 @@ class Parser {
 
     private Expr term() {
         Expr expr = factor();
-        
+
         while (match(MINUS, PLUS)) {
             Token operator = previous();
             Expr right = factor();
@@ -54,7 +61,7 @@ class Parser {
 
     private Expr factor() {
         Expr expr = unary();
-        
+
         while (match(SLASH, STAR)) {
             Token operator = previous();
             Expr right = unary();
@@ -70,7 +77,7 @@ class Parser {
             Expr right = unary();
             return new Expr.Unary(operator, right);
         }
-        
+
         return primary();
     }
 
@@ -88,6 +95,8 @@ class Parser {
             consume(RIGHT_PAREN, "Expect ')' after expression.");
             return new Expr.Grouping(expr);
         }
+
+        throw error(peek(), "Expect expression.");
     }
 
 
@@ -99,6 +108,12 @@ class Parser {
             }
         }
         return false;
+    }
+
+    private Token consume(TokenType type, String message) {
+        if (check(type)) return advance();
+
+        throw error(peek(), message);
     }
 
     private boolean check(TokenType type) {
@@ -123,7 +138,38 @@ class Parser {
         return tokens.get(current - 1);
     }
 
+    private ParseError error(Token token, String message) {
+        Lox.error(token, message);
+        return new ParseError();
+    }
 
+    static void error(Token token, String message) {
+        if (token.type == TokenType.EOF) {
+            report(token.line, " at end", message);
+        }
+    }
 
+    private void synchronize() {
+        advance();
+        while (!isAtEnd()) {
+            if (previous().type == SEMICOLON) return;
+
+            switch (peek().type) {
+                case CLASS:
+                case FUN:
+                case VAR:
+                case FOR:
+                case IF:
+                case WHILE:
+                case PRINT:
+                case RETURN:
+                case SUPER:
+                case THIS:
+                    return;
+            }
+
+            advance();
+        }
+    }
 
 }

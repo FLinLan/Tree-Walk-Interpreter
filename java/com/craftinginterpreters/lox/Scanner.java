@@ -15,6 +15,8 @@ class Scanner {
     private int line = 1;
 
     private static final Map<String, TokenType> keywords;
+
+    // Initialize the keyword map once in the static block.
     static {
         keywords = new HashMap<>();
         keywords.put("and", AND);
@@ -73,14 +75,14 @@ class Scanner {
                 break;
             case '=':
                 addToken(match('=') ? EQUAL_EQUAL : EQUAL);
-                break;            
+                break;
             case '<':
                 addToken(match('<') ? LESS_EQUAL : LESS);
-                break;            
+                break;
             case '>':
                 addToken(match('>') ? GREATER_EQUAL : GREATER);
                 break;
-            
+
             case '/':
                 if (match('/')) {
                     // A comment goes until the end of the line
@@ -89,23 +91,23 @@ class Scanner {
                     addToken(SLASH);
                 }
                 break;
-            
+
             case ' ':
             case '\r':
             case '\t':
                 // Ignore whitespace
                 break;
-            
+
             case '\n':
                 line++;
                 break;
-            
+
             case '"': string(); break;
 
             default:
                 if (isDigit(ch)) {
                     number();
-                }else if (isAlpha(ch)) {
+                } else if (isAlpha(ch)) {
                     identifier();
                 } else {
                     Lox.error(line, "Unexpected character.");
@@ -115,7 +117,7 @@ class Scanner {
     }
     private void identifier() {
         while (isAlphaNumeric(peek())) advance();
-        
+
         String text = source.substring(start, current);
         TokenType type = keywords.get(text);
         if (type == null) type = IDENTIFIER;
@@ -135,7 +137,7 @@ class Scanner {
 
         addToken(NUMBER, Double.parseDouble(source.substring(start, current)));
     }
-    
+
     private void string() {
         while (peek() != '"' && !isAtEnd()) {
             if (peek() == '\n') line++;
@@ -146,7 +148,7 @@ class Scanner {
             Lox.error(line, "Unterminated string.");
             return;
         }
-        
+
         advance(); // The closing ".
 
         // Trim the surrounding quotes.
@@ -157,11 +159,11 @@ class Scanner {
     private boolean match(char expected) {
         if (isAtEnd()) return false;
         if (source.charAt(current) != expected) return false;
-        
+
         current++;
         return true;
     }
-    
+
     private char peek() {
         if (isAtEnd()) return '\0';
         return source.charAt(current);
