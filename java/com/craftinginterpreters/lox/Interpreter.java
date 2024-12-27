@@ -22,6 +22,14 @@ class Interpreter implements Expr.Visitor<Object> {
         Object right = evaluate(expr.right);
 
         switch (expr.operator.type) {
+            case GREATER:
+                return (double)left > (double)right;
+            case GREATER_EQUAL:
+                return (double)left >= (double)right;
+            case LESS:
+                return (double)left < (double)right;
+            case LESS_EQUAL:
+                return (double)left <= (double)right;
             case PLUS:
                 if (left instanceof Double && right instanceof Double) {
                     return (double) left + (double) right;
@@ -37,7 +45,7 @@ class Interpreter implements Expr.Visitor<Object> {
                 }
                 throw new RuntimeException("Division by zero.");
             case BANG_EQUAL:
-                return isEqual(left, right);
+                return !isEqual(left, right);
             case EQUAL_EQUAL:
                 return isEqual(left, right);
         }
@@ -55,16 +63,29 @@ class Interpreter implements Expr.Visitor<Object> {
             case BANG:
                 return !isTruthy(right);
             case MINUS:
+            checkNumberOperand(expr.operator, right);
             return -(double)right;
         }
 
         return null; // TOD
     }
 
+    private void checkNumberOperand(Token operator, Object operand) {
+        if (!(operand instanceof Double)) {
+            throw new RuntimeError(operator, "Operand must be a number.");
+        }
+    }
+
     private boolean isTruthy(Object value) {
         if (value == null) return false;
         if (value instanceof Boolean) return (boolean) value;
         return true;
+    }
+
+    private boolean isEqual(Object a, Object b) {
+        if (a == null && b == null) return true;
+        if (a == null || b == null) return false;
+        return a.equals(b);
     }
 
 
