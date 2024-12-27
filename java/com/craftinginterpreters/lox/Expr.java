@@ -18,7 +18,6 @@ abstract class Expr {
         R visitVariableExpr(Variable expr);
 
         // Nested Expr classes here...@interface
-
         abstract <R> R accept(Visitor<R> visitor);
     }
 
