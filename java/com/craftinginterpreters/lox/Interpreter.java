@@ -1,5 +1,4 @@
 package com.craftinginterpreters.lox;
-
 import java.util.List;
 
 class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
@@ -7,7 +6,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     void interpret(List<Stmt> statements) {
         try {
             for (Stmt stmt : statements) {
-                execute(statements);
+                execute(stmt);
             }
         } catch (RuntimeError error) {
             Lox.runtimeError(error);
@@ -33,7 +32,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public void visitBlockStmt(Stmt.Block stmt) {
-        executeBlock(stmt.statements, new Envrionment(environment));
+        executeBlock(stmt.statements, new Environment(environment));
         return null;
     }
 
@@ -56,6 +55,16 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     @Override
     public Void visitExpressionStmt(Stmt.Expression stmt) {
         evaluate(stmt.expression);
+        return null;
+    }
+
+    @Override
+    public Void visitIfStmt(Stmt.If stmt) {
+        if (isTruthy(evaluate(stmt.condition))) {
+            execute(stmt.thenBranch);
+        } else if (stmt.elseBranch != null) {
+            execute(stmt.elseBranch);
+        }
         return null;
     }
 
