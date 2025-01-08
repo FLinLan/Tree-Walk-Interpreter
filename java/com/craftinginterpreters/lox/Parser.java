@@ -263,7 +263,7 @@ class Parser {
             report(token.line, " at end", message);
         }
     }
-
+    
     private void synchronize() {
         advance();
         while (!isAtEnd()) {
